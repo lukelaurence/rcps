@@ -1114,30 +1114,34 @@ void check_state_and_recurse(int best_so_far, objects_t *inputstate,
   if (length > best_so_far) {
     most_frames_lasted = std::max(most_frames_lasted, length);
     printf("new best on path = %d, states_checked = %ld, seed_idx = %d, "
-           "depth = %d\n",
-           length, states_checked, best_seed_idx, depth);
-    check_small_changes(length, inputstate, 0, depth + 1, best_seed_idx);
-  } else if (false && steps_since_last_increase < 10) {
-    // Simulated Annealing: A worse point is accepted probabilistically.
-    // double temperature = initial_temperature / pow(2,length);
-    double temperature = initial_temperature / (length + 1);
-    double criterion =
-        exp((best_so_far - length) /
-            temperature); // got a seg fault when I used length instead of depth
-    double rnd = randbetween(0.0, 1.0); // between 0 and 1
-    if (ticker > 0 && rnd < criterion) {
-      ticker--;
-      check_small_changes(best_so_far, inputstate,
-                          steps_since_last_increase + 1, depth + 1,
-                          best_seed_idx);
-    } else {
-      ticker++;
+           "depth = %d, best overall is %d\n",
+           length, states_checked, best_seed_idx, depth, most_frames_lasted);
+    if (length == most_frames_lasted) {
+      printobjectstates(inputstate);
     }
-    /* else if (best_so_far > 120 && length == best_so_far && last_increase) {
-   // only allow neutral moves after the first 120 frames
-   check_small_changes(best_so_far, inputstate, false, depth + 1,
- best_seed_idx);
- }  */
+    check_small_changes(length, inputstate, 0, depth + 1, best_seed_idx);
+    // } else if (false && steps_since_last_increase < 10) {
+    //   // Simulated Annealing: A worse point is accepted probabilistically.
+    //   // double temperature = initial_temperature / pow(2,length);
+    //   double temperature = initial_temperature / (length + 1);
+    //   double criterion =
+    //       exp((best_so_far - length) /
+    //           temperature); // got a seg fault when I used length instead of
+    //           depth
+    //   double rnd = randbetween(0.0, 1.0); // between 0 and 1
+    //   if (ticker > 0 && rnd < criterion) {
+    //     ticker--;
+    //     check_small_changes(best_so_far, inputstate,
+    //                         steps_since_last_increase + 1, depth + 1,
+    //                         best_seed_idx);
+    //   } else {
+    //     ticker++;
+    // }
+  } else if (best_so_far > 120 && length == best_so_far &&
+             steps_since_last_increase < 1) {
+    // only allow neutral moves after the first 120 frames
+    check_small_changes(best_so_far, inputstate, steps_since_last_increase + 1,
+                        depth + 1, best_seed_idx);
   }
 }
 
@@ -1222,7 +1226,7 @@ void check_small_changes(int best_so_far, objects_t *inputstate,
                                best_so_far, inputstate,
                                steps_since_last_increase, depth, seed_idx);
     all_small_changes_to_field(
-        &inputstate->pushers[a].state, 0,
+        &inputstate->pushers[a].counter, 0,
         max_index_to_max[inputstate->pushers[a].max_index], 1, 0, best_so_far,
         inputstate, steps_since_last_increase, depth, seed_idx);
   }
@@ -1340,6 +1344,7 @@ void runsimulation_randomstates() {
   // initialize_rand();
   objects_t *currentstartingarray =
       (objects_t *)malloc(sizeof(*currentstartingarray));
+  memset(currentstartingarray, 0, sizeof(objects_t));
   while (true) {
     randomizearray(currentstartingarray);
     auto p = steps_still_for_state(currentstartingarray);
@@ -1552,6 +1557,19 @@ void check_small_changes_add_remove_dust(
   dust_frames.push_back(back);
   // leave it as you found it
 }
+std::vector<bool> read_vector_from_string(std::string frames) {
+  std::vector<bool> vec;
+  for (const auto &f : frames) {
+    if (f == '+') {
+      vec.push_back(true);
+    } else if (f == '-') {
+      vec.push_back(false);
+    } else {
+      printf("shouldn't happen\n");
+    }
+  }
+  return vec;
+}
 
 // start with state, and a number of frames to stay wait
 // make a new state by changing a state from nothing to dust, dust to nothing,
@@ -1564,19 +1582,33 @@ void runsimulation_add_remove_dust(int frames_to_wait, int bad_steps_allowed) {
   // for (size_t i = 0; i < dust_frames.size(); i++) {
   //   dust_frames[i] = randbetween<0, 10>() == 0;
   // }
-  objects_t state;
-  int length = steps_still_for_state_add_remove_dust(dust_frames, state, 0);
-  states_checked += 1;
-  printf("start is %d\n", length);
-  check_small_changes_add_remove_dust(length, 0, 1, {{dust_frames, length}},
-                                      bad_steps_allowed);
+  dust_frames = read_vector_from_string(
+      "-----+------------+----------------+---------------------------------++-"
+      "-------+-+------------+--------+----+-+-------------+----+--------+-----"
+      "------------+-+-----------------------------------------");
+  while (true) {
+    objects_t state;
+    int length = steps_still_for_state_add_remove_dust(dust_frames, state, 0);
+    states_checked += 1;
+    printf("start is %d\n", length);
+    check_small_changes_add_remove_dust(length, 0, 1, {{dust_frames, length}},
+                                        bad_steps_allowed);
+    printf("finished seraching from the starting point, starting over\n");
+    dust_frames.clear();
+    for (size_t i = 0; i < dust_frames.size(); i++) {
+      dust_frames[i] = randbetween<0, 10>() == 0;
+    }
+  }
 }
 
 int main(int argc, char *argv[]) {
   // for (int i = 0; i < num_seeds; i++) {
   //   rngSeeds[i] = pollRNG(rngValue);
   // }
-  if (argc < 3) {
+  if (argc == 1){
+    runsimulation_randomstates();
+  } else{
+    if (argc < 3) {
     printf("usage\n./rcps <waiting frames> <bad steps allowed>\n");
     exit(1);
   }
@@ -1586,5 +1618,6 @@ int main(int argc, char *argv[]) {
     max_states_to_check = atol(argv[3]);
   }
   runsimulation_add_remove_dust(frames_to_wait, bad_steps);
+  }
   return 0;
 }
