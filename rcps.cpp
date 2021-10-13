@@ -1,5 +1,3 @@
-//  clang++ -std=c++17 -lm -O3 -march=native -o run  rcps.cpp
-//  (on Apple M1) clang++ -std=c++17 -lm -O3 -o run  rcps.cpp
 #include <cmath>
 #include <map>
 #include <math.h>
@@ -26,13 +24,11 @@ std::mt19937 gen(rd());
 int randbetween(int a, int b) {
   std::uniform_int_distribution<> distrib(a, b);
   return distrib(gen);
-  // return ((b - a + 1) * (((double)rand()) / RAND_MAX) + a);
 }
 
 double randbetween(double a, double b) {
   std::uniform_real_distribution<> distrib(a, b);
   return distrib(gen);
-  // return ((b - a + 1) * (((double)rand()) / RAND_MAX) + a);
 }
 
 template <int a, int b> int randbetween() {
@@ -55,8 +51,7 @@ template <int a, int b> int randbetween() {
 
 /* Returns a new number that is the current number moved towards the target
 number by at most max displacement. */
-int moveNumberTowards(int currentNumber, int targetNumber,
-                      int maxDisplacement) {
+int moveNumberTowards(int currentNumber,int targetNumber,int maxDisplacement) {
   if (currentNumber == targetNumber) { // exactly equal to target
     return currentNumber;
   } else if (currentNumber < targetNumber) { // lower than target
@@ -149,8 +144,7 @@ void bobomb(bobomb_t *b, unsigned short *rngValue) {
   // this variable is 0 when the bob-omb is not blinking
   if (b->blinkingTimer > 0) { // currently blinking
     b->blinkingTimer = (b->blinkingTimer + 1) % 16;
-  } else if (pollRNG(rngValue) <=
-             655) { // the else already means it's not currently blinking
+  } else if (pollRNG(rngValue) <= 655) { // not currently blinking
     b->blinkingTimer++;
   }
 }
@@ -955,102 +949,99 @@ void printobjectstates(const objects_t *const inputstate) {
            inputstate->rotating_blocks[a].remaining_time);
   }
   for (a = 0; a < 2; a++) {
-    printf("Rotating Triangular Prism %i max: %i\n", a + 1,
-           inputstate->rotatingtriangularprisms[a].max);
-    printf("Rotating Triangular Prism %i timer: %i\n", a + 1,
+    printf("Rotating Triangular Prism %i max: %i, timer: %i\n", a + 1,
+           inputstate->rotatingtriangularprisms[a].max,
            inputstate->rotatingtriangularprisms[a].timer);
   }
   for (a = 0; a < 4; a++) {
-    printf("Pendulum %i waiting timer: %i\n", a + 1,
-           inputstate->pendulums[a].waitingTimer);
-    printf("Pendulum %i acceleration direction: %i\n", a + 1,
-           inputstate->pendulums[a].accelerationDirection);
-    printf("Pendulum %i angle: %i\n", a + 1, inputstate->pendulums[a].angle);
-    printf("Pendulum %i angular velocity: %i\n", a + 1,
-           inputstate->pendulums[a].angularVelocity);
-    printf("Pendulum %i acceleration magnitude: %i\n", a + 1,
+    printf("Pendulum %i waiting timer: %i, acceleration direction: %i,\
+ angle: %i, angular velocity: %i, acceleration magnitude: %i\n", a + 1,
+           inputstate->pendulums[a].waitingTimer,
+           inputstate->pendulums[a].accelerationDirection,
+           inputstate->pendulums[a].angle,
+           inputstate->pendulums[a].angularVelocity,
            inputstate->pendulums[a].accelerationMagnitude);
   }
-  printf("Treadmill current speed: %i\n", inputstate->treadmill.currentSpeed);
-  printf("Treadmill target speed: %i\n", inputstate->treadmill.targetSpeed);
-  printf("Treadmill max: %i\n", inputstate->treadmill.max);
-  printf("Treadmill counter: %i\n", inputstate->treadmill.counter);
+  printf("Treadmill current speed: %i, target speed: %i, max: %i, counter: %i\n",
+           inputstate->treadmill.currentSpeed,
+           inputstate->treadmill.targetSpeed,
+           inputstate->treadmill.max,
+           inputstate->treadmill.counter);
   for (a = 0; a < 12; a++) {
-    printf("Pusher %i max: %i \n", a + 1,
-           max_index_to_max[inputstate->pushers[a].max_index]);
-    printf("Pusher %i countdown: %i \n", a + 1,
-           inputstate->pushers[a].countdown);
-    printf("Pusher %i state: %i \n", a + 1, inputstate->pushers[a].state);
-    printf("Pusher %i counter: %i \n", a + 1, inputstate->pushers[a].counter);
+    printf("Pusher %i max: %i, countdown: %i, state: %i, counter: %i\n", a + 1,
+           max_index_to_max[inputstate->pushers[a].max_index],
+           inputstate->pushers[a].countdown,
+           inputstate->pushers[a].state,
+           inputstate->pushers[a].counter);
   }
-  printf("Cog current angular velocity: %i \n",
-         inputstate->rcpscog.currentAngularVelocity);
-  printf("Cog target anvular velocity: %i \n",
-         inputstate->rcpscog.targetAngularVelocity);
+  printf("RCPS Cog current angular velocity: %i, target angular velocity: %i\n",
+           inputstate->rcpscog.currentAngularVelocity,
+           inputstate->rcpscog.targetAngularVelocity);
   for (a = 0; a < 4; a++) {
-    printf("Cogs %i currentAngularVelocity: %i \n", a + 1,
-           inputstate->cogs[a].currentAngularVelocity);
-    printf("Cogs %i targetAngularVelocity: %i \n", a + 1,
+    printf("Cog %i current angular velocity: %i, target angular velocity: %i\n",
+           a + 2,
+           inputstate->cogs[a].currentAngularVelocity,
            inputstate->cogs[a].targetAngularVelocity);
   }
   for (a = 0; a < 2; a++) {
-    printf("Spinningtriangles %i currentAngularVelocity: %i \n", a + 1,
-           inputstate->spinningtriangles[a].currentAngularVelocity);
-    printf("Spinningtriangles %i targetAngularVelocity: %i \n", a + 1,
+    printf("Spinning Triangle %i current angular velocity: %i,\
+ target angular velocity: %i\n", a + 1,
+           inputstate->spinningtriangles[a].currentAngularVelocity,
            inputstate->spinningtriangles[a].targetAngularVelocity);
   }
-  printf("Pit Block height: %i \n", inputstate->pitblock.height);
-  printf("Pit Block vertical speed: %i \n", inputstate->pitblock.verticalSpeed);
-  printf("Pit Block state: %i \n", inputstate->pitblock.state);
-  printf("Pit Block max: %i \n", inputstate->pitblock.max);
-  printf("Pit Block counter: %i \n", inputstate->pitblock.counter);
+  printf("Pit Block height: %i, vertical speed: %i, state: %i, max: %i,\
+ counter: %i\n",
+           inputstate->pitblock.height,
+           inputstate->pitblock.verticalSpeed,
+           inputstate->pitblock.state,
+           inputstate->pitblock.max,
+           inputstate->pitblock.counter);
   for (a = 0; a < 2; a++) {
-    printf("Hand %i angle: %i \n", a + 1, inputstate->hands[a].angle);
-    printf("Hand %i max: %i \n", a + 1, inputstate->hands[a].max);
-    printf("Hand %i target angle: %i \n", a + 1,
-           inputstate->hands[a].targetAngle);
-    printf("Hand %i displacement: %i \n", a + 1,
-           inputstate->hands[a].displacement);
-    printf("Hand %i direction timer: %i \n", a + 1,
-           inputstate->hands[a].directionTimer);
-    printf("Hand %i timer: %i \n", a + 1, inputstate->hands[a].timer);
+    printf("Hand %i angle: %i, max: %i, target angle: %i, displacement: %i,\
+ direction timer: %i, timer: %i\n", a + 1,
+           inputstate->hands[a].angle,
+           inputstate->hands[a].max,
+           inputstate->hands[a].targetAngle,
+           inputstate->hands[a].displacement,
+           inputstate->hands[a].directionTimer,
+           inputstate->hands[a].timer);
   }
   for (a = 0; a < 14; a++) {
     // printf("Spinner %i direction: %i \n", a + 1,
     //        inputstate->spinners[a].direction);
-    printf("Spinner %i max: %i \n", a + 1, inputstate->spinners[a].max);
-    printf("Spinner %i counter: %i \n", a + 1, inputstate->spinners[a].counter);
+    printf("Spinner %i max: %i, counter: %i\n", a + 1,
+           inputstate->spinners[a].max,
+           inputstate->spinners[a].counter);
   }
   for (a = 0; a < 6; a++) {
-    printf("Wheel %i max: %i \n", a + 1, inputstate->wheels[a].max);
-    printf("Wheel %i angle: %i \n", a + 1, inputstate->wheels[a].angle);
-    printf("Wheel %i target angle: %i \n", a + 1,
-           inputstate->wheels[a].targetAngle);
-    printf("Wheel %i displacement: %i \n", a + 1,
-           inputstate->wheels[a].displacement);
-    printf("Wheel %i direction timer: %i \n", a + 1,
-           inputstate->wheels[a].directionTimer);
-    printf("Wheel %i timer: %i \n", a + 1, inputstate->wheels[a].timer);
+    printf("Wheel %i max: %i, angle: %i, target angle: %i, displacement: %i,\
+ direction timer: %i, timer: %i\n", a + 1,
+           inputstate->wheels[a].max,
+           inputstate->wheels[a].angle,
+           inputstate->wheels[a].targetAngle,
+           inputstate->wheels[a].displacement,
+           inputstate->wheels[a].directionTimer,
+           inputstate->wheels[a].timer);
   }
   for (a = 0; a < 2; a++) {
     // printf("Elevator %i max: %i \n", a + 1, inputstate->elevators[a].max);
-    printf("Elevator %i counter: %i \n", a + 1,
+    printf("Elevator %i counter: %i\n", a + 1,
            inputstate->elevators[a].counter);
   }
-  printf("Cog current angular velocity: %i \n",
-         inputstate->sixthcog.currentAngularVelocity);
-  printf("Cog target angular velocity: %i \n",
+  printf("Cog 6 current angular velocity: %i, target angular velocity: %i\n",
+         inputstate->sixthcog.currentAngularVelocity,
          inputstate->sixthcog.targetAngularVelocity);
-  printf("Thwomp height: %i \n", inputstate->thwomp.height);
-  printf("Thwomp max: %i \n", inputstate->thwomp.max);
-  printf("Thwomp counter: %i \n", inputstate->thwomp.counter);
-  printf("Thwomp state: %i \n", inputstate->thwomp.state);
-  printf("Thwomp vertical speed: %i \n", inputstate->thwomp.verticalSpeed);
+  printf("Thwomp height: %i, max: %i, counter: %i, state: %i, vertical speed: %i\n",
+           inputstate->thwomp.height,
+           inputstate->thwomp.max,
+           inputstate->thwomp.counter,
+           inputstate->thwomp.state,
+           inputstate->thwomp.verticalSpeed);
   for (a = 0; a < 2; a++) {
-    printf("Bobomb %i blinking timer: %i \n", a + 1,
+    printf("Bobomb %i blinking timer: %i\n", a + 1,
            inputstate->bobombs[a].blinkingTimer);
   }
-  printf("RNGvalue: %i \n", inputstate->rngValue);
+  printf("RNGvalue: %i\n", inputstate->rngValue);
 }
 
 const int num_seeds = 65114;
@@ -1072,19 +1063,22 @@ std::pair<int, int> steps_still_for_state(objects_t *currentstartingarray,
     states.rngValue = rngSeeds[i];
     states.rcpscog.small_enough_movement_so_far = 1;
     int a = 0;
-    for (a = 0; a < 1200; a++) {
+    while(states.rcpscog.small_enough_movement_so_far != 0){
       advanceobjects(&states);
-      if (states.rcpscog.small_enough_movement_so_far == 0) {
-        break;
-      }
+      a++;
     }
-
-    if (states.rcpscog.small_enough_movement_so_far == 1) {
-      printf("cog was still the whole time !!!\n");
-      printobjectstates(currentstartingarray);
-      exit(0);
-      break;
-    }
+    // for (a = 0; a < 1200; a++) {
+    //   advanceobjects(&states);
+    //   if (states.rcpscog.small_enough_movement_so_far == 0) {
+    //     break;
+    //   }
+    // }
+    // if (states.rcpscog.small_enough_movement_so_far == 1) {
+    //   printf("cog was still the whole time !!!\n");
+    //   printobjectstates(currentstartingarray);
+    //   exit(0);
+    //   break;
+    // }
     if (a > max_still) {
       max_still = a;
       seed_idx_for_max_still = i;
@@ -1095,8 +1089,8 @@ std::pair<int, int> steps_still_for_state(objects_t *currentstartingarray,
 
 long states_checked = 0;
 int most_frames_lasted = 0;
-double initial_temperature = 0.125;
-int ticker = 10;
+// double initial_temperature = 0.125;
+// int ticker = 10;
 
 std::map<long, long> found_per_length;
 
